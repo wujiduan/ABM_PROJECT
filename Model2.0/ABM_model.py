@@ -142,5 +142,70 @@ class AttendanceModel(Model):
         return self.gammas[id] * (eta * (beta * PI + (1 - beta) * NI) +
                                   (1 - eta) * self.q_stars[id] - emotion)
 
-    def GenerateInteractions(attendedList, adjacencyMatrix, S):
-        pass
+    def GenerateInteractions(self, adjacencyMatrix, S):
+      
+      
+      """I am not sure that the matrix modification inside this function works. It should be enough
+        to write those lines as another function """
+          
+    #create a new empty graph
+    g=nx.Graph()
+
+    #create a vector of senders
+    probability_sender = []
+    for temp_sender in self.attended_list:
+        p_normalization_s += self.schedule.agents[temp_sender].emotion
+    for temp_sender in self.attended_list:
+        probability_sender.append(self.schedule.agents[temp_sender].emotion/p_normalization_s)
+
+    senders = np.random.choice(self.attended_list, S, probability_sender)
+
+    #create a vector of receivers
+    receivers = []
+
+    #for every sender pick a receiver
+    for i in senders:
+        probility_receiver = []
+        for j in self.attended_list:
+            if j == i:
+                probability_receiver.append(0)
+                continue
+            else:
+                p_normalization_r = np.sum(adjacencyMatrix,axis=1).tolist()[i] - adjacencyMatrix[i][i] + len(adjacencyMatrix[i]) - 1
+                probability_receiver.append((1+adjacencyMatrix[i][j])/p_normalization_r)
+
+        receivers.append(np.random.choice(self.attend_list, probablity_receiver))
+
+    #generate a vector with interaction weights between 0 and 1
+    #general comment: the choice of the weights is temporary, we have to discuss which way is the best
+
+    alphas = np.random.rand(S)
+
+    #add the influence of previous friendship
+    for i in range(S):
+        alphas[i] = alphas [i] + adjacencyMatrix[senders[i]][receivers[i]]
+
+    #update the weight of the links in the adjacency matrix
+    friendship_increase = 0.1
+
+    for i in range(S):
+        adjacencyMatrix[senders[i]][receivers[i]] += friendship_increase
+    #matrix has to remain symmetrical
+        adjacencyMatrix[receivers[i]][senders[i]] += friendship_increase
+    #check values between 0 1
+        if adjacencyMatrix[senders[i]][receivers[i]]>1:
+        adjacencyMatrix[senders[i]][receivers[i]]=1
+        adjacencyMatrix[receivers[i]][senders[i]]=1
+
+    for i in range(S):
+        g.add_edge(senders[i], receivers[i], alphas[i])
+
+    #teacher_node=0
+    #N=S
+    #alpha_t = np.random.rand(N)
+    #temporary value
+    #for i in range(N):
+    #   g.add_edge(teacher_node, np.random.choice(self.attended_list), alpha_t[i])
+
+    return g
+
