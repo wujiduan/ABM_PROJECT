@@ -19,9 +19,9 @@ class AttendanceAgent(Agent):
         Args:
             emotion: emotion value of an agent
             openness: parameter for an agent as a sender
-            susceptibility: parameter
-
-        Arousal triggers, but valence sets the magnitude & the sign of the expression
+            susceptibility: parameter for senders
+            amplifier: parameter for senders
+            bias: parameter for sender
         '''
         self.emotion = emotion
         self.expressiveness = expressiveness
@@ -32,11 +32,12 @@ class AttendanceAgent(Agent):
         self.attend = attend
 
     def step(self):
-
-        k1, k2, k3, k4 = self.model.rk4(self.model.dq_dt, self.unique_id,
-                                        self.emotion)
-        # self.dt has been multiplied in the rk4 function
-        self._next_emotion = self.emotion + (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        self._next_emotion = self.emotion
+        if self.unique_id != self.model.num_agents:
+            k1, k2, k3, k4 = self.model.rk4(self.model.dq_dt, self.unique_id,
+                                            self.emotion)
+            # self.dt has been multiplied in the rk4 function
+            self._next_emotion = self.emotion + (k1 + 2 * k2 + 2 * k3 + k4) / 6
 
     def advance(self):
         self.emotion = self._next_emotion
