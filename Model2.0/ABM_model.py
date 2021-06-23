@@ -55,10 +55,14 @@ class AttendanceModel(Model):
 
         # Set configuration for data collection
         self.datacollector = DataCollector(
-            agent_reporters={"Emotion": lambda agent: agent.emotion},
+            agent_reporters={"Emotion": lambda agent: agent.emotion,
+                            "Attend": lambda agent: agent.attend},
+                                
             model_reporters={
                 "Attendance": "attendance_rate",
-                "adjacencyMatrix": "adjacency_matrix"
+                "adjacencyMatrix": "adjacency_matrix",
+                "attendedList" : "attended_list_updated",
+                
             })
 
         # Initial emotions obey the normal distribution
@@ -94,15 +98,22 @@ class AttendanceModel(Model):
     @property
     def attendance_rate(self):
         return len(self.attended_list) / self.num_agents
+    
+    @property   
+    def attended_list_updated(self): 
+        return self.attended_list
 
     def UpdateAttendedList(self):
         self.attended_list.clear()
         for i in range(self.num_agents):
             temp_agent = self.schedule.agents[i]
+            temp_agent.attend=False
             rn = np.random.rand()
             if rn < temp_agent.emotion:
                 self.attended_list.append(i)
-        self.datacollector.collect(self)
+                temp_agent.attend=True
+        #self.datacollector.collect(self)
+    
 
     def rk4(self, f, i, y):
         """ Returns k1, k2, k3, k4 according to the Runge-Kutta method
