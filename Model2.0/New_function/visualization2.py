@@ -3,7 +3,7 @@ import random
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from ABM_model import AttendanceModel
+from ABM_model2 import AttendanceModel
 
 #Adj Matrix Visualization
 import pathpy as pp
@@ -158,7 +158,6 @@ def initial_emotion_hist(model, num_agents):
 
 
 def plot_attendance_step(model): 
-  
     df=model.datacollector.get_agent_vars_dataframe()["Attend"].reset_index()
     timesteps = df["Step"].unique()
     agent_ids = df["AgentID"].unique()
@@ -178,12 +177,9 @@ def plot_attendance_step(model):
                 cols.append('red')
         scatter=ax.scatter(timesteps, myarray, s=1, c=cols, alpha=1)
     plt.show()
-    
-    
-    #if color.any()!= False:
-         #   legend1 = ax.legend(*scatter.legend_elements(),
-         #                       loc="upper left", title="Attendance")
-    #ax.add_artist(legend1)
+
+
+   
 
 
 
