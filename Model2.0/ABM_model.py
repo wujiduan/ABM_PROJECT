@@ -27,7 +27,7 @@ class AttendanceModel(Model):
                  alpha_t_lowerbound,
                  max_steps=500,
                  lecture_duration=50,
-                 dt=0.1) -> None:
+                 dt=0.1, interactions_multiplier=2) -> None:
         super().__init__()
 
         random.seed(seed)
@@ -52,6 +52,7 @@ class AttendanceModel(Model):
         self.interaction_network = None
         self.senders = []
         self.receivers = []
+        self.interactions_multiplier=interactions_multiplier
 
         # Set configuration for data collection
         self.datacollector = DataCollector(
@@ -80,6 +81,7 @@ class AttendanceModel(Model):
                                          susceptbilities[i], amplifiers[i],
                                          biases[i])
             self.schedule.add(temp_agent)
+            self.attended_list.append(i)
         '''
         Add the teacher node, since the teacher only act as a sender, the expressiveness and the initial emotion
         are the only parameters we need to consider, the susceptibility of the teacher is set to 0, which ensures
@@ -93,7 +95,7 @@ class AttendanceModel(Model):
 
     @property
     def interaction_num(self):
-        return self.num_agents * 2
+        return int(self.num_agents * self.interactions_multiplier)
 
     @property
     def attendance_rate(self):
@@ -102,17 +104,30 @@ class AttendanceModel(Model):
     @property   
     def attended_list_updated(self): 
         return self.attended_list
-
+ 
+    
     def UpdateAttendedList(self):
-        self.attended_list.clear()
+        k_drop=7
+        k_rec=15
+        # the bigger the k the lesser likely is a drop
         for i in range(self.num_agents):
             temp_agent = self.schedule.agents[i]
-            temp_agent.attend=False
-            rn = np.random.rand()
-            if rn < temp_agent.emotion:
-                self.attended_list.append(i)
-                temp_agent.attend=True
-        #self.datacollector.collect(self)
+            
+            if i in self.attended_list:
+                rn = np.random.rand()**k_drop
+                
+                if rn > temp_agent.emotion:
+                    self.attended_list.remove(i)
+                    temp_agent.attend=False
+            else: 
+                rn = np.random.rand()**k_rec
+                
+                if  rn > temp_agent.emotion:
+                    self.attended_list.append(i)
+                    temp_agent.attend=True
+                      
+            
+                
     
 
     def rk4(self, f, i, y):

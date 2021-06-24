@@ -6,7 +6,7 @@ import networkx as nx
 from mesa.model import Model
 from mesa.time import SimultaneousActivation
 from mesa.datacollection import DataCollector
-from ABM_agent2 import AttendanceAgent
+from ABM_agent import AttendanceAgent
 
 
 class AttendanceModel(Model):
@@ -80,7 +80,6 @@ class AttendanceModel(Model):
                                          susceptbilities[i], amplifiers[i],
                                          biases[i])
             self.schedule.add(temp_agent)
-            self.attended_list.append(i)
         '''
         Add the teacher node, since the teacher only act as a sender, the expressiveness and the initial emotion
         are the only parameters we need to consider, the susceptibility of the teacher is set to 0, which ensures
@@ -104,7 +103,7 @@ class AttendanceModel(Model):
     def attended_list_updated(self): 
         return self.attended_list
 
-    """def UpdateAttendedList(self):
+    def UpdateAttendedList(self):
         self.attended_list.clear()
         for i in range(self.num_agents):
             temp_agent = self.schedule.agents[i]
@@ -113,18 +112,7 @@ class AttendanceModel(Model):
             if rn < temp_agent.emotion:
                 self.attended_list.append(i)
                 temp_agent.attend=True
-        #self.datacollector.collect(self)"""
-    
-    def UpdateAttendedList(self):
-        k=100
-        # the bigger the k the lesser likely is a drop
-        for i in (self.attended_list):
-            temp_agent = self.schedule.agents[i]
-            rn = np.random.rand()**k
-            if rn > temp_agent.emotion:
-                self.attended_list.remove(i)
-                temp_agent.attend=False
-                
+        #self.datacollector.collect(self)
     
 
     def rk4(self, f, i, y):

@@ -13,7 +13,7 @@ class AttendanceAgent(Agent):
                  susceptbility,
                  amplifier,
                  bias,
-                 attend=True) -> None:
+                 attend=False) -> None:
         super().__init__(unique_id, model)
         '''
         Args:
