@@ -109,38 +109,38 @@ class AttendanceModel(Model):
         return self.attended_list
 
     def UpdateAttendedList(self):
-        # k_drop = 7
-        # k_rec = 15
-        # # the bigger the k the lesser likely is a drop
-        # for i in range(self.num_agents):
-        #     temp_agent = self.schedule.agents[i]
-
-        #     if i in self.attended_list:
-        #         rn = np.random.rand()**k_drop
-
-        #         if rn > temp_agent.emotion:
-        #             self.attended_list.remove(i)
-        #             temp_agent.attend = False
-        #     else:
-        #         rn = np.random.rand()**k_rec
-
-        #         if rn > temp_agent.emotion:
-        #             self.attended_list.append(i)
-        #             temp_agent.attend = True
-        k_drop = 0.25
-        k_rec = 4
+        k_drop = 7
+        k_rec = 15
+        # the bigger the k the lesser likely is a drop
         for i in range(self.num_agents):
             temp_agent = self.schedule.agents[i]
+
             if i in self.attended_list:
-                rn = np.random.rand()
-                if rn > temp_agent.emotion**k_drop:
+                rn = np.random.rand()**k_drop
+
+                if rn > temp_agent.emotion:
                     self.attended_list.remove(i)
                     temp_agent.attend = False
             else:
-                rn = np.random.rand()
-                if rn < temp_agent.emotion**k_rec:
+                rn = np.random.rand()**k_rec
+
+                if rn > temp_agent.emotion:
                     self.attended_list.append(i)
                     temp_agent.attend = True
+#         k_drop = 0.25
+#         k_rec = 4
+#         for i in range(self.num_agents):
+#             temp_agent = self.schedule.agents[i]
+#             if i in self.attended_list:
+#                 rn = np.random.rand()
+#                 if rn > temp_agent.emotion**k_drop:
+#                     self.attended_list.remove(i)
+#                     temp_agent.attend = False
+#             else:
+#                 rn = np.random.rand()
+#                 if rn < temp_agent.emotion**k_rec:
+#                     self.attended_list.append(i)
+#                     temp_agent.attend = True
 
     def rk4(self, f, i, y):
         """ Returns k1, k2, k3, k4 according to the Runge-Kutta method
