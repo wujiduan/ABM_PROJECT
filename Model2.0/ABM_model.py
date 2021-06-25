@@ -27,7 +27,8 @@ class AttendanceModel(Model):
                  alpha_t_lowerbound,
                  max_steps=500,
                  lecture_duration=50,
-                 dt=0.1, interactions_multiplier=2) -> None:
+                 dt=0.1,
+                 interactions_multiplier=2) -> None:
         super().__init__()
 
         random.seed(seed)
@@ -52,19 +53,21 @@ class AttendanceModel(Model):
         self.interaction_network = None
         self.senders = []
         self.receivers = []
-        self.interactions_multiplier=interactions_multiplier
+        self.interactions_multiplier = interactions_multiplier
 
         # Set configuration for data collection
-        self.datacollector = DataCollector(
-            agent_reporters={"Emotion": lambda agent: agent.emotion,
-                            "Attend": lambda agent: agent.attend},
-                                
-            model_reporters={
-                "Attendance": "attendance_rate",
-                "adjacencyMatrix": "adjacency_matrix",
-                "attendedList" : "attended_list_updated",
-                
-            })
+        self.datacollector = DataCollector(agent_reporters={
+            "Emotion": lambda agent: agent.emotion,
+            "Attend": lambda agent: agent.attend
+        },
+                                           model_reporters={
+                                               "Attendance":
+                                               "attendance_rate",
+                                               "adjacencyMatrix":
+                                               "adjacency_matrix",
+                                               "attendedList":
+                                               "attended_list_updated",
+                                           })
 
         # Initial emotions obey the normal distribution
         initial_emotions = np.clip(
@@ -100,35 +103,44 @@ class AttendanceModel(Model):
     @property
     def attendance_rate(self):
         return len(self.attended_list) / self.num_agents
-    
-    @property   
-    def attended_list_updated(self): 
+
+    @property
+    def attended_list_updated(self):
         return self.attended_list
- 
-    
+
     def UpdateAttendedList(self):
-        k_drop=7
-        k_rec=15
-        # the bigger the k the lesser likely is a drop
+        # k_drop = 7
+        # k_rec = 15
+        # # the bigger the k the lesser likely is a drop
+        # for i in range(self.num_agents):
+        #     temp_agent = self.schedule.agents[i]
+
+        #     if i in self.attended_list:
+        #         rn = np.random.rand()**k_drop
+
+        #         if rn > temp_agent.emotion:
+        #             self.attended_list.remove(i)
+        #             temp_agent.attend = False
+        #     else:
+        #         rn = np.random.rand()**k_rec
+
+        #         if rn > temp_agent.emotion:
+        #             self.attended_list.append(i)
+        #             temp_agent.attend = True
+        k_drop = 0.25
+        k_rec = 4
         for i in range(self.num_agents):
             temp_agent = self.schedule.agents[i]
-            
             if i in self.attended_list:
-                rn = np.random.rand()**k_drop
-                
-                if rn > temp_agent.emotion:
+                rn = np.random.rand()
+                if rn > temp_agent.emotion**k_drop:
                     self.attended_list.remove(i)
-                    temp_agent.attend=False
-            else: 
-                rn = np.random.rand()**k_rec
-                
-                if  rn > temp_agent.emotion:
+                    temp_agent.attend = False
+            else:
+                rn = np.random.rand()
+                if rn < temp_agent.emotion**k_rec:
                     self.attended_list.append(i)
-                    temp_agent.attend=True
-                      
-            
-                
-    
+                    temp_agent.attend = True
 
     def rk4(self, f, i, y):
         """ Returns k1, k2, k3, k4 according to the Runge-Kutta method
