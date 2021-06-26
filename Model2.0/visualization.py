@@ -41,12 +41,13 @@ def Initialize_Adj_Matrix(k, num_agents):
 def AdjacencyGauss(mu, sigma, num_agents):
     adjacencyMatrix = np.random.normal(mu, sigma, (num_agents, num_agents))
     adjacencyMatrix = (adjacencyMatrix + adjacencyMatrix.T) / 2
-    for i in range(num_agents):
-        for j in range(num_agents):
-            if adjacencyMatrix[i][j] < 0:
-                adjacencyMatrix[i][j] = 0
-            elif adjacencyMatrix[i][j] > 1:
-                adjacencyMatrix[i][j] = 1
+    adjacencyMatrix = np.clip(adjacencyMatrix, 0, 1)
+#     for i in range(num_agents):
+#         for j in range(num_agents):
+#             if adjacencyMatrix[i][j] < 0:
+#                 adjacencyMatrix[i][j] = 0
+#             elif adjacencyMatrix[i][j] > 1:
+#                 adjacencyMatrix[i][j] = 1
     return adjacencyMatrix
 
 
