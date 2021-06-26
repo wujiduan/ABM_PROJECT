@@ -4,6 +4,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from ABM_model import AttendanceModel
+import scipy as sc
 
 #Adj Matrix Visualization
 import pathpy as pp
@@ -12,6 +13,22 @@ from mesa import Model
 from mesa import Agent
 import matplotlib.pyplot as plt
 
+
+
+
+
+def Initialize_Adj_Matrix(k, num_agents): 
+    adjacencyMatrix = np.zeros((num_agents, num_agents))
+    for i in range(num_agents):
+        for n in range(sc.stats.poisson.rvs(k)):
+            j=int(np.random.uniform(0, num_agents))
+            while (i==j):
+                j=int(np.random.uniform(0, num_agents))
+
+            adjacencyMatrix[i][j]=np.random.uniform()
+
+    adjacencyMatrix = (adjacencyMatrix + adjacencyMatrix.T) / 2
+    return adjacencyMatrix 
 
 
 
