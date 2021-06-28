@@ -293,13 +293,13 @@ class AttendanceModel(Model):
             #add the influence of previous friendship
             # - to bound the alphas within the [0, 1] interval, I suggest using multiplications instead of additions
             ## addition
-            # for i in range(S):
-            #     alphas[i] = (alphas[i] +
-            #                  adjacencyMatrix[senders[i]][receivers[i]]) / 2
-            ## multiplication
             for i in range(group_interaction_num):
-                alphas[i] *= self.adjacency_matrix[group_senders[i]][
-                    group_receivers[i]]
+                alphas[i] = (alphas[i] + self.adjacency_matrix[
+                    group_senders[i]][group_receivers[i]]) / 2
+            ## multiplication
+#             for i in range(group_interaction_num):
+#                 alphas[i] *= self.adjacency_matrix[group_senders[i]][
+#                     group_receivers[i]]
             for i in range(group_interaction_num):
                 self.interaction_network.add_edge(group_senders[i],
                                                   group_receivers[i],
