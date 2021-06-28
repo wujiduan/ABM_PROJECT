@@ -250,7 +250,7 @@ class AttendanceModel(Model):
                 self.GenerateSubgroupInteractions(temp_subgroup,
                                                   temp_interaction_num)
             # only update the students adjacency matrix
-            if self.updateAdjMat:
+            if self.updateAdjMat and self.schedule.steps % self.lecture_duration == 0 :
                 self.UpdateAdjacencyMatrix()
 
             # add the interactions between the teacher node and the student nodes
@@ -314,12 +314,16 @@ class AttendanceModel(Model):
         # new - old = (1 - lambda) * (1 - old)
         # - this can save us efforts to confine values in [0, 1]
         # - also, "the higher the old_friendship is, the less the absolute increase will be"
-        # friendship_increase = self.friendship_increase
-        # for s in senders:
-        #     self.adjacency_matrix[s][receivers] += friendship_increase
-        # for r in receivers:
-        #     self.adjacency_matrix[r][senders] += friendship_increase
         my_lambda = self.my_lambda
+        senders = self.senders
+        receivers = self.receivers
+        friendship_increase = self.friendship_increase
+        for s in senders:
+             self.adjacency_matrix[s][receivers] += friendship_increase
+        for r in receivers:
+             self.adjacency_matrix[r][senders] += friendship_increase
+        self.adjacency_matrix = np.clip(self.adjacency_matrix, 0, 1)
+        """my_lambda = self.my_lambda
         senders = self.senders
         receivers = self.receivers
         for s in senders:
@@ -329,4 +333,5 @@ class AttendanceModel(Model):
             self.adjacency_matrix[r][senders] = self.adjacency_matrix[r][
                 senders] * my_lambda + 1 - my_lambda
 
-        self.adjacency_matrix = np.clip(self.adjacency_matrix, 0, 1)
+        self.adjacency_matrix = np.clip(self.adjacency_matrix, 0, 1)"""
+

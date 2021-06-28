@@ -13,9 +13,6 @@ from mesa import Model
 from mesa import Agent
 import matplotlib.pyplot as plt
 
-<<<<<<< HEAD
-
-
 
 
 def Initialize_Adj_Matrix(k, num_agents): 
@@ -32,9 +29,6 @@ def Initialize_Adj_Matrix(k, num_agents):
     return adjacencyMatrix 
 
 
-
-=======
->>>>>>> ac38eb5c5f6ebb1310e57162c4ee9f006b670368
 ##############################################
 
 
@@ -167,16 +161,21 @@ def plot_agents(model):
 
 def plot_adj_matrix(adjacencyMatrix, num_agents):
 
-    fig, ax = plt.subplots(figsize=(14, 14))
-    ax.matshow(adjacencyMatrix, cmap=plt.cm.Blues)
-
     for i in range(num_agents):
         for j in range(num_agents):
             if i == j:
                 adjacencyMatrix[i][j] = 0
-
+                
+    fig, ax = plt.subplots(figsize=(14, 14))
+    ax.matshow(adjacencyMatrix, cmap=plt.cm.Blues)
+    
+    for i in range(num_agents):
+        for j in range(num_agents):
             c = round(adjacencyMatrix[j, i], 2)
             ax.text(i, j, str(c), va='center', ha='center')
+    
+
+    
 
 
 def get_adj_matrix(model, step):
